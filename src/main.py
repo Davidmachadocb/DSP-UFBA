@@ -28,14 +28,13 @@ if __name__ == "__main__":
         os.makedirs("build")
 
     #parameters
-    fs = 10000              
-    N_sym = 3000            
-    delta_f_real = 200
-    delta_nu = 0.5
-    Ts = 1 / fs
-
+    fs = 100000              
+    N_sym = 2000            
+    delta_f_real = 500
+    delta_nu = 500
+    Ts = 1/fs
     #phase Noise
-    sigma_phase = np.sqrt(2 * np.pi * delta_nu * Ts)
+    sigma_phase = 2 * np.pi * Ts * delta_nu
     delta_theta = np.random.normal(loc=0.0, scale=sigma_phase, size=N_sym)
     theta_k = np.cumsum(delta_theta)
     
@@ -57,25 +56,25 @@ if __name__ == "__main__":
     #process
     z_freq_corrected, f_est = dsp.freq_recovery(y_received, fs)
     print(f"Freq Offset Real: {delta_f_real} Hz | Estimated: {f_est:.4f} Hz")
-    z_final, theta_est = dsp.phase_recovery(z_freq_corrected)
+    z_final, theta_est = dsp.phase_recovery(z_freq_corrected, )
 
     
     #PLOT
     fig, (ax1, ax2, ax3) = plt.subplots(1, 3)
 
     #raw
-    ax1.scatter(y_received.real, y_received.imag, s=2, c='tab:red', alpha=0.5)
-    ax1.set_title(f"1. Recebido (Raw)\nOffset $\Delta f \\approx {delta_f_real}$ Hz")
+    ax1.scatter(y_received.real, y_received.imag, s=20, c='blue', alpha=0.8, edgecolors="darkblue")
+    ax1.set_title(r"1. $y[k]$ with some $\theta[k]$")
     ax1.set_xlim(-1.5, 1.5); ax1.set_ylim(-1.5, 1.5)
 
     #freq recovery
-    ax2.scatter(z_freq_corrected.real, z_freq_corrected.imag, s=2, c='tab:orange', alpha=0.5)
-    ax2.set_title(f"2. Pós-Rec. Frequência\nRemoveu rotação rápida")
+    ax2.scatter(z_freq_corrected.real, z_freq_corrected.imag, s=20, c='green', alpha=0.8, edgecolors="darkgreen")
+    ax2.set_title(f"2. Frequency Recovery")
     ax2.set_xlim(-1.5, 1.5); ax2.set_ylim(-1.5, 1.5)
 
     #phase recovery
-    ax3.scatter(z_final.real, z_final.imag, s=2, c='tab:green', alpha=0.5)
-    ax3.set_title(f"3. Pós-Rec. Fase (Final)\nConstelação Limpa")
+    ax3.scatter(z_final.real, z_final.imag, s=20, c='orange', alpha=0.8, edgecolors="darkorange")
+    ax3.set_title(f"3. Phase Recovery with Viterbi & Viterbi")
     ax3.set_xlim(-1.5, 1.5); ax3.set_ylim(-1.5, 1.5)
 
     #add grid lines
